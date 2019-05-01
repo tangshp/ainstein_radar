@@ -100,7 +100,7 @@ private:
   std::unique_ptr<rviz::BoolProperty> show_speed_property_;
   std::unique_ptr<rviz::BoolProperty> show_info_property_;
   std::unique_ptr<rviz::FloatProperty> info_text_height_property_;
-};
+ };
 
 } // end namespace ainstein_radar_rviz_plugins
 

@@ -4,6 +4,7 @@
 #include <rviz/ogre_helpers/shape.h>
 #include <rviz/ogre_helpers/arrow.h>
 #include <rviz/ogre_helpers/movable_text.h>
+#include <rviz/ogre_helpers/point_cloud.h>
 
 #include <ainstein_radar_msgs/RadarTargetArray.h>
 
@@ -12,6 +13,7 @@ namespace rviz
   class Shape;
   class Arrow;
   class MovableText;
+  class PointCloud;
 }
 
 namespace ainstein_radar_rviz_plugins
@@ -25,8 +27,7 @@ namespace ainstein_radar_rviz_plugins
   class TargetVisual
   {
   public:
-  TargetVisual( Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node, rviz::Shape::Type type ) :
-    pos( type, scene_manager, parent_node ),
+  TargetVisual( Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node ) :
       speed( scene_manager, parent_node ),
       info( "test" )
 	{
@@ -36,7 +37,7 @@ namespace ainstein_radar_rviz_plugins
 	}      
     ~TargetVisual() {};
 
-    rviz::Shape pos;
+    rviz::PointCloud::Point pos;
     rviz::Arrow speed;
     rviz::MovableText info;
   };
@@ -71,7 +72,7 @@ public:
 
   // Set the color and alpha of the visual, which are user-editable
   // parameters and therefore don't come from the Radar message.
-  void setColor( float r, float g, float b, float a );
+  void setColor( const Ogre::ColourValue &color, double alpha );
 
   // Set the scale of the visual, which are user-editable
   // parameters and therefore don't come from the Radar message.
@@ -95,7 +96,7 @@ public:
   // Set target shapes for rendering:
   void setTargetShape( int type )
   {
-    shape_type_ = static_cast<rviz::Shape::Type>( type );
+   shape_type_ = static_cast<rviz::PointCloud::RenderMode>( type );
   }
   
   // Maximum number of target visuals:
@@ -117,8 +118,11 @@ private:
   float min_range_;
   float max_range_;
 
-  // Shapes to use for rendering:
-  rviz::Shape::Type shape_type_;
+  // Settings to use for rendering:
+  double shape_scale_;
+  Ogre::ColourValue shape_color_;
+  double shape_alpha_;
+  rviz::PointCloud::RenderMode shape_type_;
   
   // Determines whether speed arrows are rendered with zero length:
   bool show_speed_arrows_;
@@ -128,6 +132,9 @@ private:
 
   // Target info character (text) height:
   float info_text_height_;
+
+  // Point cloud of targets:
+  std::unique_ptr<rviz::PointCloud> cloud_;  
 };
 
 } // end namespace ainstein_radar_rviz_plugins

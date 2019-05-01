@@ -49,57 +49,61 @@ namespace ainstein_radar_rviz_plugins
   {
     // Options for displaying targets:
     color_property_.reset( new rviz::ColorProperty( "Color", QColor( 255, 0, 0 ),
-					       "Color to draw the target markers.",
-					       this, SLOT( updateColorAndAlpha() ) ) );
+						    "Color to draw the target markers.",
+						    this, SLOT( updateColorAndAlpha() ) ) );
     
     alpha_property_.reset( new rviz::FloatProperty( "Alpha", 1.0,
-					      "Marker opacity. 0 is fully transparent, 1 is fully opaque.",
-					      this, SLOT( updateColorAndAlpha() ) ) );
+						    "Marker opacity. 0 is fully transparent, 1 is fully opaque.",
+						    this, SLOT( updateColorAndAlpha() ) ) );
 
     scale_property_.reset( new rviz::FloatProperty( "Scale", 0.2,
-					       "Marker scale, in meters.",
-					       this, SLOT( updateScale() ) ) );
+						    "Marker scale.",
+						    this, SLOT( updateScale() ) ) );
   
-    shape_property_.reset( new rviz::EnumProperty( "Shape", "Cube",
-					      "Target shape type.",
-					      this, SLOT( updateTargetShape() ) ) );    
-    shape_property_->addOptionStd( "Cube", 1 );
-    shape_property_->addOptionStd( "Sphere", 3 );
+    shape_property_.reset( new rviz::EnumProperty( "Shape", "Points",
+						   "Target shape type.",
+						   this, SLOT( updateTargetShape() ) ) );    
+    shape_property_->addOptionStd( "Points", rviz::PointCloud::RenderMode::RM_POINTS );
+    shape_property_->addOptionStd( "Squares", rviz::PointCloud::RenderMode::RM_SQUARES );
+    shape_property_->addOptionStd( "Flat Squares", rviz::PointCloud::RenderMode::RM_FLAT_SQUARES );
+    shape_property_->addOptionStd( "Spheres", rviz::PointCloud::RenderMode::RM_SPHERES );
+    //shape_property_->addOptionStd( "Tiles", rviz::PointCloud::RenderMode::RM_TILES ); // TILES crashes RViz
+    shape_property_->addOptionStd( "Boxes", rviz::PointCloud::RenderMode::RM_BOXES );
 
     // Create the history length option:
     history_length_property_.reset( new rviz::IntProperty( "Number of Scans", 1,
-						      "Number of radar scans to display.",
-						      this, SLOT( updateHistoryLength() )) );
+							   "Number of radar scans to display.",
+							   this, SLOT( updateHistoryLength() )) );
     history_length_property_->setMin( 1 );
     history_length_property_->setMax( 1000000 );
 
     // Create the minimum target range option:
     min_range_property_.reset( new rviz::FloatProperty( "Min Range", 0.0,
-						   "Minimum distance of targets to be displayed.",
-						   this, SLOT( updateMinRange() )) );
+							"Minimum distance of targets to be displayed.",
+							this, SLOT( updateMinRange() )) );
     min_range_property_->setMin( 0.0 );
     min_range_property_->setMax( 100.0 );
 
     // Create the maximum target range option:
     max_range_property_.reset( new rviz::FloatProperty( "Max Range", 100.0,
-						   "Maximum distance of targets to be displayed.",
-						   this, SLOT( updateMaxRange() )) );
+							"Maximum distance of targets to be displayed.",
+							this, SLOT( updateMaxRange() )) );
     max_range_property_->setMin( 0.0 );
     max_range_property_->setMax( 100.0 );
 
     // Determines whether to show the speed arrows:
     show_speed_property_.reset( new rviz::BoolProperty( "Show Speed", false,
-						   "Toggles display of arrows indicating target speed.",
-						   this, SLOT( updateShowSpeedArrows() ) ) );
+							"Toggles display of arrows indicating target speed.",
+							this, SLOT( updateShowSpeedArrows() ) ) );
 
     // Determines whether to show the speed arrows:
     show_info_property_.reset( new rviz::BoolProperty( "Show Info", false,
-						  "Toggles display of target info text.",
-						  this, SLOT( updateShowTargetInfo() ) ) );
+						       "Toggles display of target info text.",
+						       this, SLOT( updateShowTargetInfo() ) ) );
 
     info_text_height_property_.reset( new rviz::FloatProperty( "Info Text Height", 0.05,
-							  "Target info text height.",
-							  this, SLOT( updateInfoTextHeight() ) ) );
+							       "Target info text height.",
+							       this, SLOT( updateInfoTextHeight() ) ) );
   }
 
   
@@ -144,7 +148,7 @@ void RadarDisplay::updateColorAndAlpha()
   color_property_->getOgreColor();
   for( const auto& v : visuals_ )
     {
-      v->setColor( color.r, color.g, color.b, alpha );
+      v->setColor( color, alpha );
     }
 }
   
@@ -243,17 +247,17 @@ void RadarDisplay::processMessage( const ainstein_radar_msgs::RadarTargetArray::
 
   // Set target data and visual options:
   // First set target shapes:
-  shape_property_->getOptionInt();
+  shape = shape_property_->getOptionInt();
   visual->setTargetShape( shape );
   
   // Then set the target data from message:
   visual->setMessage( msg );
 
   // Set the target visual options:
-  alpha_property_->getFloat();
-  color_property_->getOgreColor();
-  visual->setColor( color.r, color.g, color.b, alpha );
-  scale_property_->getFloat();
+  alpha = alpha_property_->getFloat();
+  color = color_property_->getOgreColor();
+  visual->setColor( color, alpha );
+  scale = scale_property_->getFloat();
   visual->setScale( scale );
       
   visual->setFramePosition( position );
