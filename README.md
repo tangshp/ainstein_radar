@@ -213,3 +213,7 @@ export GAZEBO_PLUGIN_PATH=$GAZEBO_PLUGIN_PATH:~/catkin_ws/devel/lib
 To test that the sensor is able to be loaded correctly in Gazebo (before adding it to another
 model), use the provided test.launch file to attempt to start Gazebo with the radar sensor. If
 you see an error about not finding the .so file, check your GAZEBO_PLUGIN_PATH.
+
+# 编译注意事项
+1. 单独编译```ainstein_radar_msgs```功能包
+2. 编译除```ainstein_radar_msgs```以外的其它功能包
